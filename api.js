@@ -2,8 +2,8 @@
 // API 請求函式
 // ========================================
 
-const axios = require('axios');
-const { API_PATH, BASE_URL, ADMIN_TOKEN } = require('./config');
+const axios = require("axios");
+const { API_PATH, BASE_URL, ADMIN_TOKEN } = require("./config");
 
 // ========== 客戶端 API ==========
 
@@ -12,8 +12,14 @@ const { API_PATH, BASE_URL, ADMIN_TOKEN } = require('./config');
  * @returns {Promise<Array>}
  */
 async function fetchProducts() {
-  // 請實作此函式
-  // 回傳 response.data.products
+  try {
+    const res = await axios.get(
+      `${BASE_URL}/api/livejs/v1/customer/${API_PATH}/products`,
+    );
+    return res.data.products;
+  } catch (error) {
+    return error.message;
+  }
 }
 
 /**
@@ -22,6 +28,15 @@ async function fetchProducts() {
  */
 async function fetchCart() {
   // 請實作此函式
+  try {
+    const res = await axios.get(
+      `${BASE_URL}/api/livejs/v1/customer/${API_PATH}/carts`,
+    );
+    const { carts, total, finalTotal } = res.data;
+    return { carts, total, finalTotal };
+  } catch (error) {
+    return error.message;
+  }
 }
 
 /**
@@ -31,7 +46,21 @@ async function fetchCart() {
  * @returns {Promise<Object>} - 回傳購物車資料
  */
 async function addToCart(productId, quantity) {
-  // 請實作此函式
+  try {
+    const data = {
+      data: {
+        productId,
+        quantity,
+      },
+    };
+    const res = await axios.post(
+      `${BASE_URL}/api/livejs/v1/customer/${API_PATH}/carts`,
+      data,
+    );
+    return res.data;
+  } catch (error) {
+    return error.message;
+  }
 }
 
 /**
@@ -41,7 +70,21 @@ async function addToCart(productId, quantity) {
  * @returns {Promise<Object>} - 回傳購物車資料
  */
 async function updateCartItem(cartId, quantity) {
-  // 請實作此函式
+  try {
+    const data = {
+      data: {
+        cartId,
+        quantity,
+      },
+    };
+    const res = await axios.patch(
+      `${BASE_URL}/api/livejs/v1/customer/${API_PATH}/carts`,
+      data,
+    );
+    return res.data;
+  } catch (error) {
+    return error.message;
+  }
 }
 
 /**
@@ -50,7 +93,14 @@ async function updateCartItem(cartId, quantity) {
  * @returns {Promise<Object>} - 回傳購物車資料
  */
 async function deleteCartItem(cartId) {
-  // 請實作此函式
+  try {
+    const res = await axios.delete(
+      `${BASE_URL}/api/livejs/v1/customer/${API_PATH}/carts/${cartId}`,
+    );
+    return res.data;
+  } catch (error) {
+    return error.message;
+  }
 }
 
 /**
@@ -58,7 +108,14 @@ async function deleteCartItem(cartId) {
  * @returns {Promise<Object>} - 回傳購物車資料
  */
 async function clearCart() {
-  // 請實作此函式
+  try {
+    const res = await axios.delete(
+      `${BASE_URL}/api/livejs/v1/customer/${API_PATH}/carts`,
+    );
+    return res.data;
+  } catch (error) {
+    return error.message;
+  }
 }
 
 /**
@@ -67,7 +124,26 @@ async function clearCart() {
  * @returns {Promise<Object>}
  */
 async function createOrder(userInfo) {
-  // 請實作此函式
+  try {
+    const userInfo = {
+      data: {
+        user: {
+          name: "六角學院",
+          tel: "07-5313506",
+          email: "hexschool@hexschool.com",
+          address: "高雄市六角學院路",
+          payment: "Apple Pay",
+        },
+      },
+    };
+    const res = await axios.post(
+      `${BASE_URL}/api/livejs/v1/customer/${API_PATH}/orders`,
+      userInfo,
+    );
+    return res.data;
+  } catch (error) {
+    return error.message;
+  }
 }
 
 // ========== 管理員 API ==========
@@ -85,7 +161,19 @@ async function createOrder(userInfo) {
  * @returns {Promise<Array>}
  */
 async function fetchOrders() {
-  // 請實作此函式
+  try {
+    const res = await axios.get(
+      `${BASE_URL}/api/livejs/v1/admin/${API_PATH}/orders`,
+      {
+        headers: {
+          authorization: ADMIN_TOKEN,
+        },
+      },
+    );
+    return res.data.orders;
+  } catch (error) {
+    return error.message;
+  }
 }
 
 /**
@@ -95,7 +183,26 @@ async function fetchOrders() {
  * @returns {Promise<Object>}
  */
 async function updateOrderStatus(orderId, isPaid) {
-  // 請實作此函式
+  try {
+    const data = {
+      data: {
+        id: orderId,
+        paid: isPaid,
+      },
+    };
+    const res = await axios.put(
+      `${BASE_URL}/api/livejs/v1/admin/${API_PATH}/orders`,
+      data,
+      {
+        headers: {
+          authorization: ADMIN_TOKEN,
+        },
+      },
+    );
+    return res.data;
+  } catch (error) {
+    return error.message;
+  }
 }
 
 /**
@@ -104,7 +211,19 @@ async function updateOrderStatus(orderId, isPaid) {
  * @returns {Promise<Object>}
  */
 async function deleteOrder(orderId) {
-  // 請實作此函式
+  try {
+    const res = await axios.delete(
+      `${BASE_URL}/api/livejs/v1/admin/${API_PATH}/orders/${orderId}`,
+      {
+        headers: {
+          authorization: ADMIN_TOKEN,
+        },
+      },
+    );
+    return res.data;
+  } catch (error) {
+    return error.message;
+  }
 }
 
 module.exports = {
@@ -117,5 +236,5 @@ module.exports = {
   createOrder,
   fetchOrders,
   updateOrderStatus,
-  deleteOrder
+  deleteOrder,
 };

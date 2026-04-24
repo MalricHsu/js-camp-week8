@@ -2,8 +2,18 @@
 // 訂單服務
 // ========================================
 
-const { createOrder, fetchOrders, updateOrderStatus, deleteOrder } = require('../api');
-const { validateOrderUser, formatDate, getDaysAgo, formatCurrency } = require('../utils');
+const {
+  createOrder,
+  fetchOrders,
+  updateOrderStatus,
+  deleteOrder,
+} = require("../api");
+const {
+  validateOrderUser,
+  formatDate,
+  getDaysAgo,
+  formatCurrency,
+} = require("../utils");
 
 /**
  * 建立新訂單
@@ -15,6 +25,24 @@ async function placeOrder(userInfo) {
   // 提示：先用 utils validateOrderUser() 驗證使用者資料，驗證失敗時回傳 { success: false, errors: [...] }
   // 驗證通過後，呼叫 createOrder() 建立訂單
   // 回傳格式：{ success: true, data: ... } / { success: false, errors: [...] }
+  const validation = validateOrderUser(userInfo);
+  if (!validation.isValid) {
+    return {
+      success: false,
+      errors: validation.errors,
+    };
+  }
+  const result = await createOrder(userInfo);
+  if (typeof result === "string") {
+    return {
+      success: false,
+      errors: result,
+    };
+  }
+  return {
+    success: true,
+    data: result,
+  };
 }
 
 /**
@@ -24,6 +52,8 @@ async function placeOrder(userInfo) {
 async function getOrders() {
   // 請實作此函式
   // 提示：呼叫 fetchOrders() 取得訂單陣列並回傳
+  const orders = fetchOrders();
+  return orders;
 }
 
 /**
@@ -33,6 +63,9 @@ async function getOrders() {
 async function getUnpaidOrders() {
   // 請實作此函式
   // 提示：呼叫 fetchOrders() 後，篩選出 paid 為 false 的訂單
+  const orders = await fetchOrders();
+  const filterOrder = orders.filter((order) => order.paid === false);
+  return filterOrder;
 }
 
 /**
@@ -42,6 +75,9 @@ async function getUnpaidOrders() {
 async function getPaidOrders() {
   // 請實作此函式
   // 提示：呼叫 fetchOrders() 後，篩選出 paid 為 true 的訂單
+  const orders = await fetchOrders();
+  const filterOrder = orders.filter((order) => order.paid === true);
+  return filterOrder;
 }
 
 /**
@@ -54,6 +90,17 @@ async function updatePaymentStatus(orderId, isPaid) {
   // 請實作此函式
   // 提示：呼叫 updateOrderStatus()
   // 回傳格式：{ success: true, data: ... } / { success: false, error: ... }
+  const result = await updateOrderStatus(orderId, isPaid);
+  if (typeof result === "string") {
+    return {
+      success: false,
+      error: result,
+    };
+  }
+  return {
+    success: false,
+    data: result,
+  };
 }
 
 /**
@@ -65,6 +112,17 @@ async function removeOrder(orderId) {
   // 請實作此函式
   // 提示：呼叫 deleteOrder()
   // 回傳格式：{ success: true, data: ... } / { success: false, error: ... }
+  const result = await deleteOrder();
+  if (typeof result === "string") {
+    return {
+      success: false,
+      error: result,
+    };
+  }
+  return {
+    success: false,
+    data: result,
+  };
 }
 
 /**
@@ -84,7 +142,17 @@ async function removeOrder(orderId) {
  * - daysAgo: 距離今天為幾天前，使用 utils getDaysAgo()
  */
 function formatOrder(order) {
-  // 請實作此函式
+  return {
+    id: order.id,
+    user: order.user,
+    products: order.products,
+    total: order.total,
+    totalFormatted: formatCurrency(order.total),
+    paid: order.paid,
+    paidText: order.paid ? "已付款" : "未付款",
+    createdAt: formatDate(order.createdAt),
+    daysAgo: getDaysAgo(order.createdAt),
+  };
 }
 
 /**
@@ -113,6 +181,46 @@ function displayOrders(orders) {
   // 商品明細：
   //   - 產品名稱 x 2（產品數量）
   // ========================================
+  /**
+   * 顯示訂單列表
+   * @param {Array} orders - 訂單陣列
+   */
+  function displayOrders(orders) {
+    // 1. 判斷訂單陣列是否為空
+    if (!orders || orders.length === 0) {
+      console.log("沒有訂單");
+      return;
+    }
+
+    console.log("訂單列表：");
+    console.log("========================================");
+
+    // 2. 遍歷訂單陣列
+    orders.forEach((order, index) => {
+      // 使用 formatOrder() 格式化每筆訂單
+      const f = formatOrder(order);
+
+      console.log(`訂單 ${index + 1}`);
+      console.log("----------------------------------------");
+      console.log(`訂單編號：${f.id}`);
+      console.log(`顧客姓名：${f.user.name}`);
+      console.log(`聯絡電話：${f.user.tel}`);
+      console.log(`寄送地址：${f.user.address}`);
+      console.log(`付款方式：${f.user.payment}`);
+      console.log(`訂單金額：${f.totalFormatted}`);
+      console.log(`付款狀態：${f.paidText}`);
+      console.log(`建立時間：${f.createdAt} (${f.daysAgo})`);
+      console.log("----------------------------------------");
+      console.log("商品明細：");
+
+      // 3. 遍歷該筆訂單內的商品陣列
+      f.products.forEach((p) => {
+        console.log(`  - ${p.title} x ${p.quantity}`);
+      });
+
+      console.log("========================================");
+    });
+  }
 }
 
 module.exports = {
@@ -123,5 +231,5 @@ module.exports = {
   updatePaymentStatus,
   removeOrder,
   formatOrder,
-  displayOrders
+  displayOrders,
 };
