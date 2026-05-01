@@ -112,7 +112,7 @@ async function removeOrder(orderId) {
   // 請實作此函式
   // 提示：呼叫 deleteOrder()
   // 回傳格式：{ success: true, data: ... } / { success: false, error: ... }
-  const result = await deleteOrder();
+  const result = await deleteOrder(orderId);
   if (typeof result === "string") {
     return {
       success: false,

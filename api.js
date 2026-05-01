@@ -4,6 +4,8 @@
 
 const axios = require("axios");
 const { API_PATH, BASE_URL, ADMIN_TOKEN } = require("./config");
+const customerApiUrl = `${BASE_URL}/api/livejs/v1/customer/${API_PATH}`;
+const adminApiUrl = `${BASE_URL}/api/livejs/v1/admin/${API_PATH}`;
 
 // ========== 客戶端 API ==========
 
@@ -13,9 +15,7 @@ const { API_PATH, BASE_URL, ADMIN_TOKEN } = require("./config");
  */
 async function fetchProducts() {
   try {
-    const res = await axios.get(
-      `${BASE_URL}/api/livejs/v1/customer/${API_PATH}/products`,
-    );
+    const res = await axios.get(`${customerApiUrl}/products`);
     return res.data.products;
   } catch (error) {
     return error.message;
@@ -29,9 +29,7 @@ async function fetchProducts() {
 async function fetchCart() {
   // 請實作此函式
   try {
-    const res = await axios.get(
-      `${BASE_URL}/api/livejs/v1/customer/${API_PATH}/carts`,
-    );
+    const res = await axios.get(`${customerApiUrl}/carts`);
     const { carts, total, finalTotal } = res.data;
     return { carts, total, finalTotal };
   } catch (error) {
@@ -53,10 +51,7 @@ async function addToCart(productId, quantity) {
         quantity,
       },
     };
-    const res = await axios.post(
-      `${BASE_URL}/api/livejs/v1/customer/${API_PATH}/carts`,
-      data,
-    );
+    const res = await axios.post(`${customerApiUrl}/carts`, data);
     return res.data;
   } catch (error) {
     return error.message;
@@ -77,10 +72,7 @@ async function updateCartItem(cartId, quantity) {
         quantity,
       },
     };
-    const res = await axios.patch(
-      `${BASE_URL}/api/livejs/v1/customer/${API_PATH}/carts`,
-      data,
-    );
+    const res = await axios.patch(`${customerApiUrl}/carts`, data);
     return res.data;
   } catch (error) {
     return error.message;
@@ -94,9 +86,7 @@ async function updateCartItem(cartId, quantity) {
  */
 async function deleteCartItem(cartId) {
   try {
-    const res = await axios.delete(
-      `${BASE_URL}/api/livejs/v1/customer/${API_PATH}/carts/${cartId}`,
-    );
+    const res = await axios.delete(`${customerApiUrl}/carts/${cartId}`);
     return res.data;
   } catch (error) {
     return error.message;
@@ -109,9 +99,7 @@ async function deleteCartItem(cartId) {
  */
 async function clearCart() {
   try {
-    const res = await axios.delete(
-      `${BASE_URL}/api/livejs/v1/customer/${API_PATH}/carts`,
-    );
+    const res = await axios.delete(`${customerApiUrl}/carts`);
     return res.data;
   } catch (error) {
     return error.message;
@@ -136,10 +124,7 @@ async function createOrder(userInfo) {
         },
       },
     };
-    const res = await axios.post(
-      `${BASE_URL}/api/livejs/v1/customer/${API_PATH}/orders`,
-      userInfo,
-    );
+    const res = await axios.post(`${customerApiUrl}/orders`, userInfo);
     return res.data;
   } catch (error) {
     return error.message;
@@ -162,14 +147,11 @@ async function createOrder(userInfo) {
  */
 async function fetchOrders() {
   try {
-    const res = await axios.get(
-      `${BASE_URL}/api/livejs/v1/admin/${API_PATH}/orders`,
-      {
-        headers: {
-          authorization: ADMIN_TOKEN,
-        },
+    const res = await axios.get(`${adminApiUrl}/orders`, {
+      headers: {
+        authorization: ADMIN_TOKEN,
       },
-    );
+    });
     return res.data.orders;
   } catch (error) {
     return error.message;
@@ -190,15 +172,11 @@ async function updateOrderStatus(orderId, isPaid) {
         paid: isPaid,
       },
     };
-    const res = await axios.put(
-      `${BASE_URL}/api/livejs/v1/admin/${API_PATH}/orders`,
-      data,
-      {
-        headers: {
-          authorization: ADMIN_TOKEN,
-        },
+    const res = await axios.put(`${adminApiUrl}/orders`, data, {
+      headers: {
+        authorization: ADMIN_TOKEN,
       },
-    );
+    });
     return res.data;
   } catch (error) {
     return error.message;
@@ -212,14 +190,11 @@ async function updateOrderStatus(orderId, isPaid) {
  */
 async function deleteOrder(orderId) {
   try {
-    const res = await axios.delete(
-      `${BASE_URL}/api/livejs/v1/admin/${API_PATH}/orders/${orderId}`,
-      {
-        headers: {
-          authorization: ADMIN_TOKEN,
-        },
+    const res = await axios.delete(`${adminApiUrl}/orders/${orderId}`, {
+      headers: {
+        authorization: ADMIN_TOKEN,
       },
-    );
+    });
     return res.data;
   } catch (error) {
     return error.message;

@@ -163,8 +163,8 @@ function displayCart(cart) {
     );
   });
   console.log("----------------------------------------");
-  console.log(`商品總計：${formatCurrency(item.total)}`);
-  console.log(`折扣後金額：${formatCurrency(item.finalTotal)}`);
+  console.log(`商品總計：${formatCurrency(cart.total)}`);
+  console.log(`折扣後金額：${formatCurrency(cart.finalTotal)}`);
 }
 
 module.exports = {
